@@ -1,0 +1,11 @@
+{
+    "name": "JointResumeWebChat",
+    "version": "0.0.0",
+    "description": "Chatroom",
+    "dependencies": {
+        "socket.io": "latest",
+        "express": "latest",
+        "ejs":"latest"
+    },
+    "author": "developer"
+}
