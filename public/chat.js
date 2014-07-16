@@ -5,7 +5,6 @@ window.onload = function() {
     var field = $("#field");
     var sendButton = $("#send");
     var content = $("#content");
-    var name = $("#name");
  
     socket.on('message', function (data) {
         if (data.message) {
@@ -25,7 +24,7 @@ window.onload = function() {
 
     var sendMessage = function() {
         var text = field.val();
-        socket.emit('send', { message: text, username: name.val() });
+        socket.emit('send', { message: text, token: document.cookie.match(/loginToken=(.*);?/)[1] });
         field.val("");
     };
  
