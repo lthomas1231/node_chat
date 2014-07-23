@@ -6,6 +6,9 @@ var app = express();
 var port = 3700;
 var crypto = require('crypto');
 
+var mongoUri = process.env.MONGOLAB_URI ||
+  process.env.MONGOHQ_URL ||
+  'mongodb://localhost:27017/test';
 
 var findUser = function(req, res, next) {
 	client.connect("mongodb://localhost:27017/test", function(err, db) {
@@ -34,7 +37,7 @@ app.post("/user", function(req, res) {
 	var token = newToken();
 	res.cookie('loginToken', token);
 
-	client.connect("mongodb://localhost:27017/test", function(err, db) {
+	client.connect(mongoUri, function(err, db) {
 		db.createCollection("user", function(err, users) {
     		users.insert({ "username": req.body.name, token: token }, function(err) {
 
@@ -61,7 +64,6 @@ io.sockets.on('connection', function (socket) {
 	socket.on('send', function (data) {
 		client.connect("mongodb://localhost:27017/test", function(err, db) {
 			db.createCollection("user", function(err, users) {
-				console.log(data.token);
 	    		users.findOne({ token: data.token }, function(err, user) {
 	    			io.sockets.emit('message', { message: data.message, username: user ? user.username : 'Anonymouse' });
 	    		});
