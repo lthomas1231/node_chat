@@ -11,7 +11,7 @@ var mongoUri = process.env.MONGOLAB_URI ||
   'mongodb://localhost:27017/test';
 
 var findUser = function(req, res, next) {
-	client.connect("mongodb://localhost:27017/test", function(err, db) {
+	client.connect(mongoUri, function(err, db) {
 		db.createCollection("user", function(err, users) {
     		users.findOne({ token: req.cookies.loginToken }, function(err, user) {
     			if (user) {
@@ -62,7 +62,7 @@ io.sockets.on('connection', function (socket) {
 	socket.emit('message', {message: 'Lacy\'s Amazing Chat'});
 
 	socket.on('send', function (data) {
-		client.connect("mongodb://localhost:27017/test", function(err, db) {
+		client.connect(mongoUri, function(err, db) {
 			db.createCollection("user", function(err, users) {
 	    		users.findOne({ token: data.token }, function(err, user) {
 	    			io.sockets.emit('message', { message: data.message, username: user ? user.username : 'Anonymouse' });
