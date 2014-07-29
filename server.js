@@ -10,18 +10,28 @@ var mongoUri = process.env.MONGOLAB_URI ||
   process.env.MONGOHQ_URL ||
   'mongodb://localhost:27017/test';
 
-var findUser = function(req, res, next) {
-	client.connect(mongoUri, function(err, db) {
-		db.createCollection("user", function(err, users) {
-    		users.findOne({ token: req.cookies.loginToken }, function(err, user) {
-    			if (user) {
-    				req.currentUser = user;
-    			}
-    		});
+// var findUser = function(req, res, next) {
+// 	client.connect(mongoUri, function(err, db) {
+// 		db.createCollection("user", function(err, users) {
+//     		users.findOne({ token: req.cookies.loginToken }, function(err, user) {
+//     			if (user) {
+//     				req.currentUser = user;
+//     			}
+//     		});
+// 		});
+// 	});
+
+// 	next();
+// };
+
+var findUser = function(token, callback) {
+	client.connect(mongoUri, function (err, db) {
+		db.createCollection("user", function (err, users) {
+			users.findOne({ token: token }, function (err, user) {
+				callback(user);
+			});
 		});
 	});
-
-	next();
 };
  
 app.set('views', __dirname + '/tpl');
@@ -31,7 +41,7 @@ app.set('view engine', "ejs");
 app.use(express.static(__dirname + '/public'));
 app.use(bodyParser());
 app.use(cookieParser());
-app.use(findUser);
+//app.use(findUser);
 
 app.post("/user", function(req, res) {
 	var token = newToken();
@@ -59,15 +69,17 @@ app.get("/chat", function(req, res){
 var io = require('socket.io').listen(app.listen(port));
 
 io.sockets.on('connection', function (socket) {
-	socket.emit('message', {message: 'Lacy\'s Amazing Chat'});
+	
+	socket.on('join', function (data) {
+		findUser(data.token, function (user) {
+			io.sockets.emit('user_joined', {username: user.username});
+		});
+	});
 
 	socket.on('send', function (data) {
-		client.connect(mongoUri, function(err, db) {
-			db.createCollection("user", function(err, users) {
-	    		users.findOne({ token: data.token }, function(err, user) {
-	    			io.sockets.emit('message', { message: data.message, username: user ? user.username : 'Anonymouse' });
-	    		});
-			});
+		console.log(data);
+		findUser(data.token, function (user) {
+			io.sockets.emit('message', { message: data.message, username: user ? user.username : 'Anonymouse' });
 		});
 	});
 });

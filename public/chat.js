@@ -5,7 +5,7 @@ window.onload = function() {
     var field = $("#field");
     var sendButton = $("#send");
     var content = $("#content");
- 
+
     socket.on('message', function (data) {
         if (data.message) {
             messages.push(data);
@@ -22,10 +22,23 @@ window.onload = function() {
         }
     });
 
+    socket.on('user_joined', function (data) {
+        console.log(data, 'HEIHEIFHE');
+        $('#chat-box-thing').append(data.username);
+    });
+
     var sendMessage = function() {
         var text = field.val();
-        socket.emit('send', { message: text, token: document.cookie.match(/loginToken=(.*);?/)[1] });
+        socket.emit('send', { message: text, token: getToken() });
         field.val("");
+    };
+
+    var joinRoom = function () {
+        socket.emit('join', { token: getToken() });
+    };
+
+    var getToken = function () {
+        return document.cookie.match(/loginToken=(.*);?/)[1];
     };
  
     sendButton.click(sendMessage);
@@ -36,5 +49,7 @@ window.onload = function() {
                 sendMessage();
             }
         });
+
+        joinRoom();
     });
 }
