@@ -27,6 +27,10 @@ window.onload = function() {
         $('#chat-box-thing').append(data.username);
     });
 
+    socket.on('users_in_room', function (data) {
+        console.log(data, 'sjaldkfjalsdjflkasjdflkajsdlfkjasdlkf');
+    });
+
     var sendMessage = function() {
         var text = field.val();
         socket.emit('send', { message: text, token: getToken() });

@@ -33,6 +33,28 @@ var findUser = function(token, callback) {
 		});
 	});
 };
+
+var addUserToRoom = function(username, callback) {
+	client.connect(mongoUri, function (err, db) {
+		db.createCollection("users_in_room", function (err, usersInRoom) {
+			usersInRoom.insert({"username": username}, function(err) {
+
+			});
+		});
+	});
+}
+
+var getUsersInRoom = function(callback) {
+	client.connect(mongoUri, function (err, db) {
+		db.createCollection("users_in_room", function (err, usersInRoom) {
+			usersInRoom.find({}, function (err, users) {
+				users.toArray(function (err, arr) {
+					callback(arr); 
+				});
+			});
+		});
+	});
+}
  
 app.set('views', __dirname + '/tpl');
 app.engine('html', require('ejs').renderFile);
@@ -73,6 +95,11 @@ io.sockets.on('connection', function (socket) {
 	socket.on('join', function (data) {
 		findUser(data.token, function (user) {
 			io.sockets.emit('user_joined', {username: user.username});
+			addUserToRoom(user.username);
+			getUsersInRoom(function(usersInRoom) {
+				//TODO: Display users/figure out when users leave
+				io.sockets.emit('users_in_room', usersInRoom);
+			});
 		});
 	});
 
