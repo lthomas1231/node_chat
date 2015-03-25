@@ -39,7 +39,7 @@ app.post("/user", function(req, res) {
 
 	client.connect(mongoUri, function(err, db) {
 		db.createCollection("user", function(err, users) {
-    		users.insert({ "username": req.body.name, token: token }, function(err) {
+    		users.insert({ "username": req.body.name, token: token, imgurl: req.body.imgurl, about: req.body.about }, function(err) {
 
     		});
 		});
@@ -65,7 +65,7 @@ io.sockets.on('connection', function (socket) {
 		client.connect(mongoUri, function(err, db) {
 			db.createCollection("user", function(err, users) {
 	    		users.findOne({ token: data.token }, function(err, user) {
-	    			io.sockets.emit('message', { message: data.message, username: user ? user.username : 'Anonymouse' });
+	    			io.sockets.emit('message', { message: data.message, username: user ? user.username : 'Anonymouse', imgurl: user.imgurl });
 	    		});
 			});
 		});

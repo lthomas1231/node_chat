@@ -10,7 +10,10 @@ window.onload = function() {
         if (data.message) {
             messages.push(data);
             var html = '';
-            for(var i=0; i<messages.length; i++) {
+            for (var i = 0; i < messages.length; i++) {
+            	if (messages[i].imgurl) {
+            		html += '<img src="' + messages[i].imgurl + '" style="height:30px"/>'
+            	}
                 html += '<b>' + (messages[i].username || 'Server') + ': </b>';
                 html += messages[i].message + '<br />';
             }
