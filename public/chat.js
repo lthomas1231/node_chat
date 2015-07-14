@@ -1,5 +1,6 @@
 window.onload = function() {
  
+    var blinkIntervalId;
     var messages = [];
     var socket = io.connect(location.origin);
     var field = $("#field");
@@ -20,6 +21,8 @@ window.onload = function() {
 
             content.html(html);
             content.scrollTop(content[0].scrollHeight);
+
+            blinkIntervalId = setInterval(blinkTitleBar(), 3000);
         } else {
             console.log("There is a problem:", data);
         }
@@ -39,5 +42,25 @@ window.onload = function() {
                 sendMessage();
             }
         });
+
+        $(window).focus(function() {
+            console.log('Clearing blink', blinkIntervalId);
+            clearInterval(blinkIntervalId);
+            window.document.title = "Default Title";
+        })
     });
+}
+
+var blinkTitleBar = function() {
+    var blinking = true;
+
+    return function() {
+        if (blinking) {
+            window.document.title = '~~~~~~~~';
+        } else {
+            window.document.title = '';
+        }
+
+        blinking = !blinking;
+    }
 }

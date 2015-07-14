@@ -10,6 +10,10 @@ var mongoUri = process.env.MONGOLAB_URI ||
   process.env.MONGOHQ_URL ||
   'mongodb://localhost:27017/test';
 
+// TODO: Wrap this nonsense client.connect { db.createCollection { blah  into helper method
+// TODO: Think about how to separate user updates, socket message handling, etc.
+// Maybe 'user' object?
+
 var findUser = function(req, res, next) {
 	client.connect(mongoUri, function(err, db) {
 		db.createCollection("user", function(err, users) {
